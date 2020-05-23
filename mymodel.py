@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# ### Fashion MNIST
-
-# ### After downloading our dataset we see it's coded in the ubyte form
 # - We then use the following function to read the data and return it as a numpy array
 
 # In[1]:
@@ -13,11 +7,11 @@ import struct
 import numpy as np
 
 def read_idx(filename):
-    """Credit: https://gist.github.com/tylerneylon"""
-    with open(filename, 'rb') as f:
-        zero, data_type, dims = struct.unpack('>HBB', f.read(4))
-        shape = tuple(struct.unpack('>I', f.read(4))[0] for d in range(dims))
-        return np.frombuffer(f.read(), dtype=np.uint8).reshape(shape)
+ """Credit: https://gist.github.com/tylerneylon"""
+ with open(filename, 'rb') as f:
+  zero, data_type, dims = struct.unpack('>HBB', f.read(4))
+  shape = tuple(struct.unpack('>I', f.read(4))[0] for d in range(dims))
+  return np.frombuffer(f.read(), dtype=np.uint8).reshape(shape)
 
 
 # ### We use the function to extact our training and test datasets
@@ -67,7 +61,7 @@ from keras import backend as K
 
 # Training Parameters
 batch_size = 128
-epochs = 3
+epochs = 1
 
 # Lets store the number of rows and columns
 img_rows = x_train[0].shape[0]
@@ -79,7 +73,7 @@ img_cols = x_train[1].shape[0]
 x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
 x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
 
-# store the shape of a single image 
+# store the shape of a single image
 input_shape = (img_rows, img_cols, 1)
 
 # change our image type to float32 data type
@@ -98,36 +92,19 @@ print(x_test.shape[0], 'test samples')
 y_train = np_utils.to_categorical(y_train)
 y_test = np_utils.to_categorical(y_test)
 
-# Let's count the number columns in our hot encoded matrix 
+# Let's count the number columns in our hot encoded matrix
 print ("Number of Classes: " + str(y_test.shape[1]))
 
 num_classes = y_test.shape[1]
 num_pixels = x_train.shape[1] * x_train.shape[2]
 
-# create model
 model = Sequential()
 
-model.add(Conv2D(32, kernel_size=(3, 3),
-                 activation='relu',
-                 input_shape=input_shape))
-model.add(BatchNormalization())
-
-model.add(Conv2D(64, (3, 3), activation='relu'))
-model.add(BatchNormalization())
-
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.25))
-
-model.add(Flatten())
-model.add(Dense(128, activation='relu'))
-model.add(BatchNormalization())
-
-model.add(Dropout(0.5))
-model.add(Dense(num_classes, activation='softmax'))
-
+import mymodule
+epochs=mymodule.architecture1(model,input_shape,num_classes)
 model.compile(loss = 'categorical_crossentropy',
-              optimizer = keras.optimizers.Adadelta(),
-              metrics = ['accuracy'])
+optimizer = keras.optimizers.Adadelta(),
+metrics = ['accuracy'])
 
 print(model.summary())
 
@@ -138,14 +115,18 @@ print(model.summary())
 
 
 history = model.fit(x_train, y_train,
-          batch_size=batch_size,
-          epochs=epochs,
-          verbose=1,
-          validation_data=(x_test, y_test))
+batch_size=batch_size,
+epochs=epochs,
+verbose=1,
+validation_data=(x_test, y_test))
 
 score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
+
+file1 = open("accuracy.txt", "w")  # write mode
+file1.write(str(score[1]*100))
+file1.close()
 
 
 # ### Let's test out our model
