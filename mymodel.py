@@ -124,7 +124,7 @@ score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 
-file1 = open("accuracy.txt", "w")  # write mode
+file1 = open("/host/accuracy.txt", "w")  # write mode
 file1.write(str(score[1]*100))
 file1.close()
 
